@@ -45,6 +45,7 @@ class MyDialog:
 	def send(self):
 		self.datbutton.configure(state=DISABLED) # Turns button grey to prevent double sending
 		count = 0
+		error = 0
 		T = Text(root, bg="grey93", borderwidth=0, height=1, width=33)
 		T.pack(padx=5)
 		T.insert(END, "Sending now, please wait...")
@@ -80,18 +81,22 @@ class MyDialog:
 				fo = open(fileds, 'rb')
 				part = MIMEApplication(fo.read())
 				fo.close()
-				part.add_header('Content-Disposition', 'attachment', filename=str(beco))
-				msg.attach(part)
+			part.add_header('Content-Disposition', 'attachment', filename=str(beco))
+			msg.attach(part)
 			server = smtplib.SMTP('smtp.gmail.com', 587)
 			server.starttls()
 			server.login(fromaddr, password)
 			text = msg.as_string()
-			server.sendmail(fromaddr, toaddr, text)
-			server.quit()
-			count = count + 1 #to print amount sent at the end
+			try:
+				server.sendmail(fromaddr, toaddr, text)
+				server.quit()
+				count = count + 1 #to print amount sent at the end
+			except:
+				error = error + 1
 		T = Text(root, bg="grey93", borderwidth=0, height=1, width=33)
 		T.pack(padx=5)
 		T.insert(END, "Sent to " + str(count) + " email address's!")
+		T.insert(END, str(error) + " errors's!")
 root = Tk()
 root.iconbitmap(default='scs.ico') #icon file
 root.title("Pete's Mass Gmail Emailer")
