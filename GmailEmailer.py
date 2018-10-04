@@ -51,11 +51,8 @@ class MyDialog:
 		T.insert(END, "Sending now, please wait...")
 		if self.var.get() == 1: # checking the box sets "var" variable to 1, which indicates an attachment
 			reco = tkFileDialog.askopenfilename()
-			print str(reco)
 			os.path.split(reco)
-			print str(os.path.split(reco))
 			beco = os.path.split(reco)[1]
-			print str(beco)
 		toaddy = self.c.get("1.0", "end-1c")
 		for line in toaddy.split(): # for every email address, do a seperate send
 			fromaddy = self.a.get("1.0", "end-1c")
@@ -74,25 +71,24 @@ class MyDialog:
 			body = ''.join(bodyz)
 			msg.attach(MIMEText(body, 'plain'))
 			if self.var.get() == 1: # checking the box sets "var" variable to 1, which indicates an attachment
-#				part = MIMEBase('application', "octet-stream")
-#				part.set_payload(open(reco, "rb").read())
-#				part.add_header('Content-Disposition', 'attachment', filename=str(beco))
+
 				fileds = str(reco)
 				fo = open(fileds, 'rb')
 				part = MIMEApplication(fo.read())
 				fo.close()
 			part.add_header('Content-Disposition', 'attachment', filename=str(beco))
 			msg.attach(part)
-			server = smtplib.SMTP('smtp.gmail.com', 587)
-			server.starttls()
-			server.login(fromaddr, password)
-			text = msg.as_string()
 			try:
+				server = smtplib.SMTP('smtp.gmail.com', 587, timeout=5)
+				server.starttls()
+				server.login(fromaddr, password)
+				text = msg.as_string()
 				server.sendmail(fromaddr, toaddr, text)
 				server.quit()
 				count = count + 1 #to print amount sent at the end
-			except:
+			except Exception,e:
 				error = error + 1
+				print str(e)
 		T = Text(root, bg="grey93", borderwidth=0, height=1, width=33)
 		T.pack(padx=5)
 		T.insert(END, "Sent to " + str(count) + " email address's!")
